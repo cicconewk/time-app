@@ -12,17 +12,11 @@ module.exports = {
       return error
     }
   },
-  getAll: (initial) => {
-    initial.map(async (city) => {
-      try {
-        const { data } = await axios.get(`https://geocode.xyz/?locate=${city}&json=1&auth=598222676528799237889x2257`)
-        const response = await axios.get(`https://api.darksky.net/forecast/${KEY}/${data.latt},${data.longt}?exclude=minutely,hourly,daily,alerts,flags`)
-        data_array.push(response.data)
-
-        return data_array
-      } catch (error) {
-        return error
-      }
-    })
+  getAll: async (initial) => {
+    return await Promise.all(initial.map(async (city) => {
+      const { data } = await axios.get(`https://geocode.xyz/?locate=${city}&json=1&auth=598222676528799237889x2257`)
+      const resolved = await axios.get(`https://api.darksky.net/forecast/${KEY}/${data.latt},${data.longt}?exclude=minutely,hourly,daily,alerts,flags`)
+      return resolved.data
+    }))
   }
 }
